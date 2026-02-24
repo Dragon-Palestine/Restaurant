@@ -1,6 +1,7 @@
 import Order from "../models/orderModel.js";
 import User from "../models/userModel.js";
-
+import { getUserByIdAndUpdate,getUserById } from "../services/userService.js";
+import { createOrder,getOrderByIdAndUpdate,getOrderById ,feachAllOrders,deleteOrderById} from "../services/orderService.js";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -12,16 +13,17 @@ export const placeOrder = async (req, res, next) => {
     return next(error);
   }
   const frontend_url = `http://localhost:${process.env.FRONTEND_PORT}`;
-
+  const user=await getUserById(req.user.id);
+  let orderId;
   try {
-    const newOrder = new Order({
+    const orderData = {
       userId: req.user.id,
       items: req.body.items,
       amount: req.body.amount,
       address: req.body.address,
-    });
-    await newOrder.save();
-    await User.findByIdAndUpdate(req.user.id, { cartData: {} });
+    }
+    const newOrder = await createOrder(orderData);
+    orderId=newOrder._id;
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
@@ -51,9 +53,13 @@ export const placeOrder = async (req, res, next) => {
       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
       cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
     });
-
+    // clear cart after placing order
+    await getUserByIdAndUpdate(req.user.id, { cartData: {} });
     res.json({ success: true, session_url: session.url });
   } catch (error) {
+      if(orderId){
+        await deleteOrderById(orderId);
+      }
     next(error);
   }
 };
@@ -62,13 +68,13 @@ export const verifyOrder = async (req, res, next) => {
   const { orderId, success } = req.body;
   try {
     if (success == "true") {
-      await Order.findByIdAndUpdate(orderId, {
+      await getOrderByIdAndUpdate(orderId, {
         payment: true,
         status: "confirmed",
       });
       res.json({ success: true, message: "Paid" });
     } else {
-      await Order.findByIdAndUpdate(orderId, { status: "cancelled" });
+      await getOrderByIdAndUpdate(orderId, { status: "cancelled" });
       res.json({ success: false, message: "Not Paid" });
     }
   } catch (error) {
@@ -78,7 +84,7 @@ export const verifyOrder = async (req, res, next) => {
 
 export const getUserOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({ userId: req.user.id });
+    const orders = await getOrderById(req.user.id);
     res.json({ success: true, data: orders });
   } catch (error) {
     next(error);
@@ -87,7 +93,7 @@ export const getUserOrders = async (req, res, next) => {
 
 export const getAllOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({});
+    const orders = await feachAllOrders();
     res.json({ success: true, data: orders });
   } catch (error) {
     next(error);
@@ -96,7 +102,7 @@ export const getAllOrders = async (req, res, next) => {
 
 export const updateOrderStatus = async (req, res, next) => {
   try {
-    await Order.findByIdAndUpdate(req.params.orderId, {
+    await getOrderByIdAndUpdate(req.params.orderId, {
       status: req.body.status,
     });
     res.json({ success: true, message: "Status Updated" });
@@ -107,7 +113,7 @@ export const updateOrderStatus = async (req, res, next) => {
 
 export const deleteOrder = async (req, res, next) => {
   try {
-    const order = await Order.findByIdAndDelete(req.params.orderId);
+    const order = await deleteOrderById(req.params.orderId);
     if (!order) {
       return res
         .status(404)
@@ -121,7 +127,7 @@ export const deleteOrder = async (req, res, next) => {
 
 export const getSingleOrder = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.orderId);
+    const order = await getOrderById(req.params.orderId);
     if (!order) {
       return res
         .status(404)

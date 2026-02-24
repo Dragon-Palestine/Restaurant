@@ -1,10 +1,11 @@
 import User from "../models/userModel.js";
+import {getUserById,getUserByIdAndUpdate} from "../services/userService.js";
 
 export const addToCart = async (req, res, next) => {
   try {
     const { foodId, quantity = 1 } = req.body;
     const userId = req.user.id;
-    const user = await User.findById(userId);
+    const user = await getUserById(userId);
     const cartData = user.cartData || {};
 
     if (cartData[foodId]) {
@@ -13,7 +14,7 @@ export const addToCart = async (req, res, next) => {
       cartData[foodId] = quantity;
     }
 
-    await User.findByIdAndUpdate(userId, { cartData }, { new: true });
+    await getUserByIdAndUpdate(userId, { cartData });
 
     res.status(201).json({
       success: true,
@@ -28,7 +29,7 @@ export const addToCart = async (req, res, next) => {
 export const getCartItems = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId);
+    const user = await getUserById(userId);
     res.status(200).json({
       success: true,
       data: user.cartData,
@@ -41,7 +42,7 @@ export const getCartItems = async (req, res, next) => {
 export const removeFromCart = async (req, res, next) => {
   try {
     const { foodId } = req.body;
-    const user = await User.findById(req.user.id);
+    const user = await getUserById(req.user.id);
 
     if (!user.cartData || !user.cartData[foodId]) {
         const error=new Error("Item not found in cart");
@@ -56,7 +57,7 @@ export const removeFromCart = async (req, res, next) => {
         delete cartData[foodId];
     }
 
-    await User.findByIdAndUpdate(req.user.id, { cartData });
+    await getUserByIdAndUpdate(req.user.id, { cartData });
     res.status(200).json({
       success: true,
       message: "Item removed from cart successfully",
