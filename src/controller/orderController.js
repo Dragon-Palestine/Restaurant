@@ -1,5 +1,3 @@
-import Order from "../models/orderModel.js";
-import User from "../models/userModel.js";
 import { getUserByIdAndUpdate,getUserById } from "../services/userService.js";
 import { createOrder,getOrderByIdAndUpdate,getOrderById ,feachAllOrders,deleteOrderById} from "../services/orderService.js";
 import Stripe from "stripe";
@@ -13,7 +11,6 @@ export const placeOrder = async (req, res, next) => {
     return next(error);
   }
   const frontend_url = `http://localhost:${process.env.FRONTEND_PORT}`;
-  const user=await getUserById(req.user.id);
   let orderId;
   try {
     const orderData = {

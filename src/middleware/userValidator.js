@@ -1,7 +1,6 @@
-import { body } from "express-validator";
-import User from "../models/userModel.js";
+import { body, param } from "express-validator";
 import { comparePassword } from "../utils/helper.js";
-
+import { getUserByEmail, getUserById } from "../services/userService.js";
 export const registerValidation = [
   body("name").notEmpty().withMessage("Name is required"),
 
@@ -9,7 +8,7 @@ export const registerValidation = [
     .isEmail()
     .withMessage("Invalid email address")
     .custom(async (email) => {
-      const existingUser = await User.findOne({ email });
+      const existingUser = await getUserByEmail(email);
 
       if (existingUser) {
         throw new Error("Email already is use");
@@ -21,7 +20,7 @@ export const registerValidation = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
-  
+
   body("role")
     .optional()
     .isIn(["user", "admin"])
@@ -33,7 +32,7 @@ export const loginValidation = [
     .isEmail()
     .withMessage("Invalid email address")
     .custom(async (email, { req }) => {
-      const user = await User.findOne({ email });
+      const user = await getUserByEmail(email);
 
       if (!user) {
         throw new Error("Invalid credentials"); // Use a generic message for security
@@ -52,6 +51,65 @@ export const loginValidation = [
       const isMatch = await comparePassword(password, req.user.password);
       if (!isMatch) {
         throw new Error("Invalid credentials"); // Use a generic message for security
+      }
+      return true;
+    }),
+];
+
+export const updateUserValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("Invalid user ID")
+    .custom(async (id, { req }) => {
+      const user = await getUserById(id);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      req.userToUpdate = user;
+      return true;
+    }),
+  body("name").optional().notEmpty().withMessage("Name cannot be empty"),
+  body("email")
+    .optional()
+    .isEmail()
+    .withMessage("Invalid email address")
+    .custom(async (email, { req }) => {
+      if (!req.userToUpdate) return false; // Prevent crash if user not found
+      const existingUser = await getUserByEmail(email);
+      if (
+        existingUser &&
+        existingUser._id.toString() !== req.userToUpdate._id.toString()
+      ) {
+        throw new Error("Email already in use");
+      }
+      return true;
+    }),
+  body("role").optional().isIn(["user", "admin"]),
+  body("oldPassword")
+    .optional()
+    .custom(async (oldPassword, { req }) => {
+      if (!req.userToUpdate) return false; // Prevent crash if user not found
+      if (!req.body.password) {
+        throw new Error("New password is required");
+      }
+      const isMatch = await comparePassword(
+        oldPassword,
+        req.userToUpdate.password,
+      );
+      if (!isMatch) {
+        throw new Error("Old password is incorrect");
+      }
+      return true;
+    }),
+  body("password")
+    .optional()
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long")
+    .custom((password, { req }) => {
+      if (!req.body.oldPassword) {
+        throw new Error(
+          "Old password is required when new password is provided",
+        );
       }
       return true;
     }),

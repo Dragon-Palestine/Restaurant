@@ -18,6 +18,15 @@ export const getUserById = async (id) => {
     }
 }
 
+export const getUserByEmail = async (email) => {
+    try {
+        const user = await User.findOne({ email });
+        return user;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getUserByIdAndUpdate = async (id, updateData) => {
     try {
         const user = await User.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });

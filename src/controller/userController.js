@@ -1,6 +1,5 @@
-import User from "../models/userModel.js";
 import { hashPassword, generateToken } from "../utils/helper.js";
-import { createUser } from "../services/userService.js";
+import { createUser,getUserByIdAndUpdate,getUserById } from "../services/userService.js";
 
 export const registerUser = async (req, res, next) => {
   const { name, email, password,role } = req.body;
@@ -44,3 +43,31 @@ export const loginUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateUser= async (req, res, next) => {
+  const { name, email, password, role,oldPassword} = req.body;
+  try {
+    const user = await getUserById(req.params.id);
+    const updatedData = {
+      name: name || user.name,
+      email: email || user.email,
+      role: role || user.role,
+      password: password ? await hashPassword(password) : user.password,
+    };
+
+    const updatedUser = await getUserByIdAndUpdate(req.params.id, updatedData);
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}

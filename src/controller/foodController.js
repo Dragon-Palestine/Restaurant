@@ -1,4 +1,3 @@
-import Food from "../models/foodModel.js";
 import { unlikeFile } from "../utils/helper.js";
 import { createFood,getAllFoods,deleteFoodById,getFoodById } from "../services/foodService.js";
 

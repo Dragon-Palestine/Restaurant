@@ -1,4 +1,3 @@
-import User from "../models/userModel.js";
 import {getUserById,getUserByIdAndUpdate} from "../services/userService.js";
 
 export const addToCart = async (req, res, next) => {
