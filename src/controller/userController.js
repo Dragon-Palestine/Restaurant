@@ -1,17 +1,22 @@
 import { hashPassword, generateToken } from "../utils/helper.js";
-import { createUser,getUserByIdAndUpdate,getUserById } from "../services/userService.js";
+import {
+  createUser,
+  getActiveUserByIdAndUpdate,
+  getActiveUserById,
+  getActiveUserByIdAndSoftDelete,
+} from "../services/userService.js";
 
 export const registerUser = async (req, res, next) => {
-  const { name, email, password,role } = req.body;
+  const { name, email, password, role } = req.body;
   try {
     const hashedPassword = await hashPassword(password);
-    const userData={
+    const userData = {
       name,
       email,
       password: hashedPassword,
-      role
-    }
-    
+      role,
+    };
+
     const user = await createUser(userData);
 
     res.status(201).json({
@@ -44,10 +49,10 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
-export const updateUser= async (req, res, next) => {
-  const { name, email, password, role,oldPassword} = req.body;
+export const updateUser = async (req, res, next) => {
+  const { name, email, password, role, oldPassword } = req.body;
   try {
-    const user = await getUserById(req.params.id);
+    const user = await getActiveUserById(req.params.id);
     const updatedData = {
       name: name || user.name,
       email: email || user.email,
@@ -55,7 +60,10 @@ export const updateUser= async (req, res, next) => {
       password: password ? await hashPassword(password) : user.password,
     };
 
-    const updatedUser = await getUserByIdAndUpdate(req.params.id, updatedData);
+    const updatedUser = await getActiveUserByIdAndUpdate(
+      req.params.id,
+      updatedData,
+    );
 
     res.status(200).json({
       success: true,
@@ -70,4 +78,23 @@ export const updateUser= async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
+
+export const removeUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user = await getActiveUserByIdAndSoftDelete(id);
+    res.status(200).json({
+      success: true,
+      message: "User removed successfully",
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

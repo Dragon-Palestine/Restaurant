@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { comparePassword } from "../utils/helper.js";
-import { getUserByEmail, getUserById } from "../services/userService.js";
+import { getActiveUserByEmail, getActiveUserById } from "../services/userService.js";
 export const registerValidation = [
   body("name").notEmpty().withMessage("Name is required"),
 
@@ -8,7 +8,7 @@ export const registerValidation = [
     .isEmail()
     .withMessage("Invalid email address")
     .custom(async (email) => {
-      const existingUser = await getUserByEmail(email);
+      const existingUser = await getActiveUserByEmail(email);
 
       if (existingUser) {
         throw new Error("Email already is use");
@@ -32,7 +32,7 @@ export const loginValidation = [
     .isEmail()
     .withMessage("Invalid email address")
     .custom(async (email, { req }) => {
-      const user = await getUserByEmail(email);
+      const user = await getActiveUserByEmail(email);
 
       if (!user) {
         throw new Error("Invalid credentials"); // Use a generic message for security
@@ -61,7 +61,7 @@ export const updateUserValidation = [
     .isMongoId()
     .withMessage("Invalid user ID")
     .custom(async (id, { req }) => {
-      const user = await getUserById(id);
+      const user = await getActiveUserById(id);
       if (!user) {
         throw new Error("User not found");
       }
@@ -75,7 +75,7 @@ export const updateUserValidation = [
     .withMessage("Invalid email address")
     .custom(async (email, { req }) => {
       if (!req.userToUpdate) return false; // Prevent crash if user not found
-      const existingUser = await getUserByEmail(email);
+      const existingUser = await getActiveUserByEmail(email);
       if (
         existingUser &&
         existingUser._id.toString() !== req.userToUpdate._id.toString()

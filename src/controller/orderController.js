@@ -1,5 +1,14 @@
-import { getUserByIdAndUpdate,getUserById } from "../services/userService.js";
-import { createOrder,getOrderByIdAndUpdate,getOrderById ,feachAllOrders,deleteOrderById} from "../services/orderService.js";
+import {
+  getActiveUserByIdAndUpdate,
+  getActiveUserById,
+} from "../services/userService.js";
+import {
+  createOrder,
+  getOrderByIdAndUpdate,
+  getOrderById,
+  feachAllOrders,
+  deleteOrderById,
+} from "../services/orderService.js";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -18,9 +27,9 @@ export const placeOrder = async (req, res, next) => {
       items: req.body.items,
       amount: req.body.amount,
       address: req.body.address,
-    }
+    };
     const newOrder = await createOrder(orderData);
-    orderId=newOrder._id;
+    orderId = newOrder._id;
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
@@ -51,12 +60,12 @@ export const placeOrder = async (req, res, next) => {
       cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
     });
     // clear cart after placing order
-    await getUserByIdAndUpdate(req.user.id, { cartData: {} });
+    await getActiveUserByIdAndUpdate(req.user.id, { cartData: {} });
     res.json({ success: true, session_url: session.url });
   } catch (error) {
-      if(orderId){
-        await deleteOrderById(orderId);
-      }
+    if (orderId) {
+      await deleteOrderById(orderId);
+    }
     next(error);
   }
 };
