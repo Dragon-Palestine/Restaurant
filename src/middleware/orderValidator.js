@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { validId } from "../utils/helper.js";
-import Order from "../models/orderModel.js";
+import { getOrderById } from "../services/orderService.js";
 
 export const placeOrderValidation = [
   body("items")
@@ -33,7 +33,7 @@ export const getOrderValidation = [
       if (!validId(id)) {
         throw new Error("Invalid Order ID");
       }
-      const order = await Order.findById(id);
+      const order = await getOrderById(id);
       if (!order) {
         throw new Error("Order not found");
       }

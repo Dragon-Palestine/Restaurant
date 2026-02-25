@@ -1,6 +1,6 @@
 import { body } from "express-validator";
-import Food from "../models/foodModel.js";
 import { validId } from "../utils/helper.js";
+import { getFoodById } from "../services/foodService.js";
 
 export const addFoodValidation = [
   body("name").trim().notEmpty().withMessage("Name is required"),
@@ -22,7 +22,7 @@ export const deleteFoodValidation = [
       if (!validId(id)) {
         throw new Error("Invalid food ID");
       }
-      const exitedFood = await Food.findById(id);
+      const exitedFood = await getFoodById(id);
       if (!exitedFood) {
         return Promise.reject("Food not found");
       }

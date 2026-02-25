@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
+import { getUserById } from "../services/userService";
 export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -18,7 +18,7 @@ export const authMiddleware = async (req, res, next) => {
 
 export const isAdmin = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await getUserById(req.user.id);
     if (user && user.role === "admin") {
       next();
     } else {
