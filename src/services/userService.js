@@ -11,7 +11,7 @@ export const createUser = async (userData) => {
 
 export const getActiveUserById = async (id) => {
   try {
-    const user = await User.findById(id, { isDeleted: { $ne: true } });
+    const user = await User.findOne({ _id: id, isDeleted: { $ne: true } });
     return user;
   } catch (error) {
     throw error;
@@ -29,11 +29,14 @@ export const getActiveUserByEmail = async (email) => {
 
 export const getActiveUserByIdAndUpdate = async (id, updateData, options) => {
   try {
-    const user = await User.findByIdAndUpdate(id, updateData, {
-      returnDocument: "after",
-      ...options,
-      isDeleted: { $ne: true },
-    });
+    const user = await User.findOneAndUpdate(
+      { _id: id, isDeleted: { $ne: true } },
+      updateData,
+      {
+        returnDocument: "after",
+        ...options,
+      },
+    );
     return user;
   } catch (error) {
     throw error;
@@ -42,12 +45,21 @@ export const getActiveUserByIdAndUpdate = async (id, updateData, options) => {
 
 export const getActiveUserByIdAndSoftDelete = async (id) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      id,
+    const user = await User.findOneAndUpdate(
+      { _id: id, isDeleted: { $ne: true } },
       { isDeleted: true, deletedAt: new Date() },
       { returnDocument: "after" },
     );
     return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllActiveUsers = async () => {
+  try {
+    const users = await User.find({ isDeleted: { $ne: true } }, "-password"); //without password
+    return users;
   } catch (error) {
     throw error;
   }

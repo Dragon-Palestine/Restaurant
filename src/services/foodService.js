@@ -33,3 +33,12 @@ export const getFoodById = async (id)=>{
         throw error;
     }
 }
+
+export const updateFoodById = async (id,updateData)=>{
+    try {
+        const food = await Food.findByIdAndUpdate(id,updateData,{returnDocument:"after"});
+        return food;
+    } catch (error) {
+        throw error;
+    }
+}

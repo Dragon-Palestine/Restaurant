@@ -29,3 +29,14 @@ export const deleteFoodValidation = [
       return true;
     }),
 ];
+
+export const updateFoodValidation = [
+  body("name").trim().notEmpty().withMessage("Name is required"),
+  body("description").trim().notEmpty().withMessage("Description is required"),
+  body("price")
+    .notEmpty()
+    .withMessage("Price is required")
+    .isNumeric()
+    .withMessage("Price must be a number"),
+  body("category").trim().notEmpty().withMessage("Category is required"),
+];

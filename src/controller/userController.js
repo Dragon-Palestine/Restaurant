@@ -4,6 +4,7 @@ import {
   getActiveUserByIdAndUpdate,
   getActiveUserById,
   getActiveUserByIdAndSoftDelete,
+  getAllActiveUsers
 } from "../services/userService.js";
 
 export const registerUser = async (req, res, next) => {
@@ -98,3 +99,16 @@ export const removeUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllUsers=async(req,res,next)=>{
+  try{
+    const users=await getAllActiveUsers();
+    res.status(200).json({
+      data:users,
+      success:true,
+      masseage:"Users fetched successfully"
+    })
+  } catch(error){
+    next(error);
+  }
+}

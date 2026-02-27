@@ -1,5 +1,5 @@
 import { unlikeFile } from "../utils/helper.js";
-import { createFood,getAllFoods,deleteFoodById,getFoodById } from "../services/foodService.js";
+import { createFood,getAllFoods,deleteFoodById,getFoodById,updateFoodById } from "../services/foodService.js";
 
 export const addFood = async (req, res, next) => {
   try {
@@ -51,3 +51,21 @@ export const deleteFood = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateFood = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, price, description, category } = req.body;
+    const foodData={
+      name,
+      price,
+      description,
+      category,
+    }
+    const newFood=await updateFoodById(id,foodData);
+
+    res.status(200).json({ success: true, data: newFood, message: "Food updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+}

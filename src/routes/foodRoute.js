@@ -1,9 +1,10 @@
 import express from "express";
-import { addFood, getFoods, deleteFood } from "../controller/foodController.js";
+import { addFood, getFoods, deleteFood,updateFood } from "../controller/foodController.js";
 import { upload } from "../middleware/multerMiddleWare.js";
 import {
   addFoodValidation,
   deleteFoodValidation,
+  updateFoodValidation
 } from "../middleware/foodValidator.js";
 import { validate } from "../middleware/validationResult.js";
 import { authMiddleware, isAdmin } from "../middleware/auth.js";
@@ -28,5 +29,15 @@ router.delete(
   validate,
   deleteFood,
 );
+router.put(
+  "/:id",
+  authMiddleware,
+  isAdmin,
+  upload.single("image"),
+  updateFoodValidation,
+  validate,
+  updateFood
+);
+
 
 export default router;

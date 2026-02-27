@@ -57,7 +57,7 @@ export const loginValidation = [
 ];
 
 export const updateUserValidation = [
-  param("id")
+  param("userId")
     .isMongoId()
     .withMessage("Invalid user ID")
     .custom(async (id, { req }) => {
@@ -111,6 +111,20 @@ export const updateUserValidation = [
           "Old password is required when new password is provided",
         );
       }
+      return true;
+    }),
+];
+
+export const removeUserValidation=[
+  param("userId")
+    .isMongoId()
+    .withMessage("Invalid user ID")
+    .custom(async (id, { req }) => {
+      const user = await getActiveUserById(id);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      req.userToUpdate = user;
       return true;
     }),
 ];
