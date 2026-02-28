@@ -1,5 +1,11 @@
 import { unlikeFile } from "../utils/helper.js";
-import { createFood,getAllFoods,deleteFoodById,getFoodById,updateFoodById } from "../services/foodService.js";
+import {
+  createFood,
+  getAllFoods,
+  deleteFoodById,
+  getFoodById,
+  updateFoodById,
+} from "../services/foodService.js";
 
 export const addFood = async (req, res, next) => {
   try {
@@ -8,13 +14,13 @@ export const addFood = async (req, res, next) => {
       throw new Error("multer dosent work");
     }
     const image = req.file.filename;
-    const foodData={
+    const foodData = {
       name,
       price,
       description,
       image,
       category,
-    }
+    };
     const food = await createFood(foodData);
     res
       .status(201)
@@ -42,7 +48,7 @@ export const getFoods = async (req, res, next) => {
 
 export const deleteFood = async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const food = await getFoodById(id);
     unlikeFile(`uploads/${food.image}`);
     await deleteFoodById(id);
@@ -56,16 +62,22 @@ export const updateFood = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, price, description, category } = req.body;
-    const foodData={
+    const foodData = {
       name,
       price,
       description,
       category,
-    }
-    const newFood=await updateFoodById(id,foodData);
+    };
+    const newFood = await updateFoodById(id, foodData);
 
-    res.status(200).json({ success: true, data: newFood, message: "Food updated successfully" });
+    res
+      .status(200)
+      .json({
+        success: true,
+        data: newFood,
+        message: "Food updated successfully",
+      });
   } catch (error) {
     next(error);
   }
-}
+};
