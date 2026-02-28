@@ -7,14 +7,15 @@ import {
   updateFoodValidation
 } from "../middleware/foodValidator.js";
 import { validate } from "../middleware/validationResult.js";
-import { authMiddleware, isAdmin } from "../middleware/auth.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { allowRoles } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
 router.post(
   "/add",
   authMiddleware,
-  isAdmin,
+  allowRoles(["admin"]),
   upload.single("image"),
   addFoodValidation,
   validate,
@@ -24,7 +25,7 @@ router.get("/list", authMiddleware, getFoods);
 router.delete(
   "/delete",
   authMiddleware,
-  isAdmin,
+  allowRoles(["admin"]),
   deleteFoodValidation,
   validate,
   deleteFood,
@@ -32,7 +33,7 @@ router.delete(
 router.put(
   "/:id",
   authMiddleware,
-  isAdmin,
+  allowRoles(["admin"]),
   upload.single("image"),
   updateFoodValidation,
   validate,

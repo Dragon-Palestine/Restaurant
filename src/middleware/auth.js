@@ -16,17 +16,3 @@ export const authMiddleware = async (req, res, next) => {
   next();
 };
 
-export const isAdmin = async (req, res, next) => {
-  try {
-    const user = await getActiveUserById(req.user.id);
-    if (user && user.role === "admin") {
-      next();
-    } else {
-      res
-        .status(403)
-        .json({ success: false, message: "Forbidden: Admins only" });
-    }
-  } catch (error) {
-    next(error);
-  }
-};

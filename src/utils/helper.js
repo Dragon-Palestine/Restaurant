@@ -44,14 +44,14 @@ export const validId = (id) => {
   return isValid;
 };
 
-export const generateToken = (email, id) => {
+export const generateToken = (email, id,role) => {
   try {
     if (!process.env.EXPIRES_IN || !process.env.JWT_SECRET) {
       const error = new Error(".env 'EXPIRES_IN or JWT_SECRET' is empty");
       error.statusCode = 404;
       throw error;
     }
-    return jwt.sign({ id, email }, process.env.JWT_SECRET, {
+    return jwt.sign({ id, email,role }, process.env.JWT_SECRET, {
       expiresIn: process.env.EXPIRES_IN,
     });
   } catch (error) {

@@ -22,7 +22,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["customer", "owner", "admin", "delivery"],
+      enum: ["customer", "owner", "admin","admin_pending", "delivery"],
       default: "customer",
     },
     isDeleted: {

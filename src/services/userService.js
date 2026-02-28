@@ -17,6 +17,14 @@ export const getActiveUserById = async (id) => {
     throw error;
   }
 };
+export const getUserById = async (id) => {
+  try {
+    const user = await User.findOne({ _id: id });
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const getActiveUserByEmail = async (email) => {
   try {
@@ -42,14 +50,30 @@ export const getActiveUserByIdAndUpdate = async (id, updateData, options) => {
     throw error;
   }
 };
+export const getUserByIdAndUpdate = async (id, updateData, options) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: id, },
+      updateData,
+      {
+        returnDocument: "after",
+        ...options,
+      },
+    );
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const getActiveUserByIdAndSoftDelete = async (id) => {
   try {
     const user = await User.findOneAndUpdate(
-      { _id: id, isDeleted: { $ne: true } },
+      { _id: id, isDeleted: false },
       { isDeleted: true, deletedAt: new Date() },
       { returnDocument: "after" },
     );
+    
     return user;
   } catch (error) {
     throw error;

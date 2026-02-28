@@ -8,6 +8,7 @@ import {
   getOrderById,
   feachAllOrders,
   deleteOrderById,
+  getOrdersByUserId
 } from "../services/orderService.js";
 import Stripe from "stripe";
 
@@ -90,7 +91,7 @@ export const verifyOrder = async (req, res, next) => {
 
 export const getUserOrders = async (req, res, next) => {
   try {
-    const orders = await getOrderById(req.user.id);
+    const orders = await getOrdersByUserId(req.user.id);
     res.json({ success: true, data: orders });
   } catch (error) {
     next(error);

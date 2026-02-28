@@ -1,6 +1,10 @@
 import { body, param } from "express-validator";
 import { comparePassword } from "../utils/helper.js";
-import { getActiveUserByEmail, getActiveUserById } from "../services/userService.js";
+import {
+  getActiveUserByEmail,
+  getActiveUserById,
+  getUserById
+} from "../services/userService.js";
 export const registerValidation = [
   body("name").notEmpty().withMessage("Name is required"),
 
@@ -23,8 +27,29 @@ export const registerValidation = [
 
   body("role")
     .optional()
-    .isIn(["user", "admin"])
-    .withMessage("Role must be either 'user' or 'admin'"),
+    .isIn(["customer","delivery","admin"]) 
+    .withMessage("Role must be 'customer or delivery or admin'"),
+];
+
+export const createUserValidation = [
+  body("name").notEmpty().withMessage("Name is required"),
+  body("email")
+    .isEmail()
+    .withMessage("Invalid email address")
+    .custom(async (email) => {
+      const existingUser = await getActiveUserByEmail(email);
+      if (existingUser) {
+        throw new Error("Email already in use");
+      }
+      return true;
+    }),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("role")
+    .notEmpty()
+    .isIn(["customer", "admin", "delivery", "owner"])
+    .withMessage("Invalid role"),
 ];
 
 export const loginValidation = [
@@ -57,7 +82,7 @@ export const loginValidation = [
 ];
 
 export const updateUserValidation = [
-  param("userId")
+  param("id")
     .isMongoId()
     .withMessage("Invalid user ID")
     .custom(async (id, { req }) => {
@@ -115,12 +140,40 @@ export const updateUserValidation = [
     }),
 ];
 
-export const removeUserValidation=[
-  param("userId")
+
+export const removeUserValidation = [
+  param("id")
     .isMongoId()
     .withMessage("Invalid user ID")
     .custom(async (id, { req }) => {
       const user = await getActiveUserById(id);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      req.userToUpdate = user;
+      return true;
+    }),
+];
+export const makeAdminValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("Invalid user ID")
+    .custom(async (id, { req }) => {
+      const user = await getActiveUserById(id);
+      console.log(user);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      req.userToUpdate = user;
+      return true;
+    }),
+];
+export const restoreUserValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("Invalid user ID")
+    .custom(async (id, { req }) => {
+      const user = await getUserById(id);
       if (!user) {
         throw new Error("User not found");
       }

@@ -4,11 +4,28 @@ import {
   getActiveUserByIdAndUpdate,
   getActiveUserById,
   getActiveUserByIdAndSoftDelete,
-  getAllActiveUsers
+  getAllActiveUsers,
+  getActiveUserByEmail,
+  getUserByIdAndUpdate
 } from "../services/userService.js";
 
+export const initOwner = async () => {
+  const user = await getActiveUserByEmail("loai@gmail.com");
+  if (user) return 0;
+  const hashedPassword = await hashPassword("1234");
+  await createUser({
+    name: "loai",
+    email: "loai@gmail.com",
+    password: hashedPassword,
+    role: "owner",
+  });
+  return 1;
+};
+
 export const registerUser = async (req, res, next) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
+  let {role}=req.body;
+
   try {
     const hashedPassword = await hashPassword(password);
     const userData = {
@@ -17,6 +34,7 @@ export const registerUser = async (req, res, next) => {
       password: hashedPassword,
       role,
     };
+    role = role == "admin" ? "admin_pending" : role;
 
     const user = await createUser(userData);
 
@@ -34,11 +52,30 @@ export const registerUser = async (req, res, next) => {
     next(error);
   }
 };
+export const makeAdmin = async (req, res, next) => {
+  try {
+    const updatedUser = await getActiveUserByIdAndUpdate(req.params.id, {
+      role: "admin",
+    });
+    res.status(200).json({
+      success: true,
+      message: "User made admin successfully",
+      data: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const loginUser = async (req, res, next) => {
   const { email } = req.body;
   try {
     const user = req.user;
-    const token = generateToken(user.email, user._id);
+    const token = generateToken(user.email, user._id,user.role);
 
     res.status(200).json({
       success: true,
@@ -85,6 +122,7 @@ export const removeUser = async (req, res, next) => {
   try {
     const id = req.params.id;
     const user = await getActiveUserByIdAndSoftDelete(id);
+    console.log(user);
     res.status(200).json({
       success: true,
       message: "User removed successfully",
@@ -100,15 +138,34 @@ export const removeUser = async (req, res, next) => {
   }
 };
 
-export const getAllUsers=async(req,res,next)=>{
-  try{
-    const users=await getAllActiveUsers();
+export const restoreUser= async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user = await getUserByIdAndUpdate(id,{isDeleted:false,deletedAt:null});
     res.status(200).json({
-      data:users,
-      success:true,
-      masseage:"Users fetched successfully"
-    })
-  } catch(error){
+      success: true,
+      message: "User restored successfully",
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
     next(error);
   }
-}
+};
+
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await getAllActiveUsers();
+    res.status(200).json({
+      data: users,
+      success: true,
+      masseage: "Users fetched successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
