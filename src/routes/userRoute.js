@@ -41,7 +41,7 @@ router.put(
   authMiddleware,
   updateUserValidation,
   validate,
-  allowRoles(["admin", "owner"]),
+  allowRoles(["admin"]),
   updateUser,
 );
 
@@ -51,17 +51,16 @@ router.delete(
   authMiddleware,
   removeUserValidation,
   validate,
-  allowRoles(["admin", "owner"]),
+  allowRoles(["admin"]),
   removeUser,
 );
-
 // Restore soft-deleted user
 router.patch(
   "/:id/restore",
   authMiddleware,
   restoreUserValidation,
   validate,
-  allowRoles(["admin", "owner"]),
+  allowRoles(["admin"]),
   restoreUser,
 );
 
@@ -71,7 +70,7 @@ router.patch(
   authMiddleware,
   makeAdminValidation,
   validate,
-  allowRoles(["owner", "admin"]),
+  allowRoles(["owner"]),
   makeAdmin,
 );
 

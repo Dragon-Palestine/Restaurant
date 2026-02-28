@@ -8,13 +8,13 @@ import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Add item to cart
+// Add item to cart (POST /api/cart)
 router.post("/", authMiddleware, addToCart);
 
-// Get all items in cart
+// Get current user's cart items (GET /api/cart)
 router.get("/", authMiddleware, getCartItems);
 
-// Remove item from cart
+// Remove specific item from cart (DELETE /api/cart/:foodId)
 router.delete("/:foodId", authMiddleware, removeFromCart);
 
 export default router;

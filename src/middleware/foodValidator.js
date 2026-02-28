@@ -31,12 +31,13 @@ export const deleteFoodValidation = [
 ];
 
 export const updateFoodValidation = [
-  body("name").trim().notEmpty().withMessage("Name is required"),
-  body("description").trim().notEmpty().withMessage("Description is required"),
+  body("name").optional().trim().notEmpty().withMessage("Name is required"),
+  body("description").optional().trim().notEmpty().withMessage("Description is required"),
   body("price")
+    .optional()
     .notEmpty()
     .withMessage("Price is required")
     .isNumeric()
     .withMessage("Price must be a number"),
-  body("category").trim().notEmpty().withMessage("Category is required"),
+  body("category").optional().trim().notEmpty().withMessage("Category is required"),
 ];

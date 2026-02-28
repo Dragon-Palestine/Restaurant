@@ -28,14 +28,14 @@ export const registerUser = async (req, res, next) => {
 
   try {
     const hashedPassword = await hashPassword(password);
+    role = role == "admin" ? "admin_pending" : role;
+
     const userData = {
       name,
       email,
       password: hashedPassword,
       role,
     };
-    role = role == "admin" ? "admin_pending" : role;
-
     const user = await createUser(userData);
 
     res.status(201).json({

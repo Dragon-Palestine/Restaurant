@@ -173,6 +173,10 @@ export const restoreUserValidation = [
     .isMongoId()
     .withMessage("Invalid user ID")
     .custom(async (id, { req }) => {
+      const isActive=await getActiveUserById(id);
+      if (isActive) {
+        throw new Error("User is already restored");
+      }
       const user = await getUserById(id);
       if (!user) {
         throw new Error("User not found");

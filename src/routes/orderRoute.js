@@ -17,13 +17,10 @@ import {
 import { validate } from "../middleware/validationResult.js";
 const router = express.Router();
 
-router.post(
-  "/place",
-  authMiddleware,
-  placeOrderValidation,
-  validate,
-  placeOrder,
-);
+// Place a new order
+router.post("/", authMiddleware, placeOrderValidation, validate, placeOrder);
+
+// Verify payment (Stripe callback)
 router.post(
   "/verify",
   authMiddleware,
@@ -31,15 +28,23 @@ router.post(
   validate,
   verifyOrder,
 );
-router.get("/user", authMiddleware, getUserOrders);
-router.get("/all", authMiddleware, getAllOrders);
-router.put(
-  "/status/:orderId",
+
+// Get logged-in user's orders
+router.get("/my-orders", authMiddleware, getUserOrders);
+
+// Get all orders (Admin only)
+router.get("/", authMiddleware, getAllOrders);
+
+// Update order status (Admin only)
+router.patch(
+  "/:orderId/status",
   authMiddleware,
   getOrderValidation,
   validate,
   updateOrderStatus,
 );
+
+// Delete an order (Admin only)
 router.delete(
   "/:orderId",
   authMiddleware,
@@ -47,6 +52,8 @@ router.delete(
   validate,
   deleteOrder,
 );
+
+// Get single order details
 router.get(
   "/:orderId",
   authMiddleware,
