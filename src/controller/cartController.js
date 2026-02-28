@@ -43,7 +43,7 @@ export const getCartItems = async (req, res, next) => {
 };
 export const removeFromCart = async (req, res, next) => {
   try {
-    const { foodId } = req.body;
+    const { foodId } = req.params;
     const user = await getActiveUserById(req.user.id);
 
     if (!user.cartData || !user.cartData[foodId]) {

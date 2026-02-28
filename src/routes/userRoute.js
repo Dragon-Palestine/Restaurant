@@ -6,7 +6,7 @@ import {
   removeUser,
   getAllUsers,
   makeAdmin,
-  restoreUser
+  restoreUser,
 } from "../controller/userController.js";
 import {
   registerValidation,
@@ -15,7 +15,7 @@ import {
   removeUserValidation,
   createUserValidation,
   makeAdminValidation,
-  restoreUserValidation
+  restoreUserValidation,
 } from "../middleware/userValidator.js";
 import { validate } from "../middleware/validationResult.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -23,15 +23,19 @@ import { allowRoles } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
+// Register a new customer (public)
 router.post("/register", registerValidation, validate, registerUser);
-router.post(
-  "/create-user",
-  authMiddleware,
-  createUserValidation,
-  validate,
-  registerUser,
-);
+
+// Create a new user with specific role (admin only)
+router.post("/", authMiddleware, createUserValidation, validate, registerUser);
+
+// Login user
 router.post("/login", loginValidation, validate, loginUser);
+
+// Get all users (admin only)
+router.get("/", authMiddleware, getAllUsers);
+
+// Update user details
 router.put(
   "/:id",
   authMiddleware,
@@ -40,19 +44,35 @@ router.put(
   allowRoles(["admin", "owner"]),
   updateUser,
 );
-router.delete("/:id", authMiddleware,removeUserValidation,validate, allowRoles(["admin","owner"]),  removeUser);
-router.put("/restore/:id", authMiddleware,restoreUserValidation,validate, allowRoles(["admin","owner"]),  restoreUser);
 
-router.get("/all", authMiddleware, getAllUsers);
+// Soft delete user
+router.delete(
+  "/:id",
+  authMiddleware,
+  removeUserValidation,
+  validate,
+  allowRoles(["admin", "owner"]),
+  removeUser,
+);
 
-router.put(
-  "/make-admin/:id",
+// Restore soft-deleted user
+router.patch(
+  "/:id/restore",
+  authMiddleware,
+  restoreUserValidation,
+  validate,
+  allowRoles(["admin", "owner"]),
+  restoreUser,
+);
+
+// Promote user to admin
+router.patch(
+  "/:id/admin",
   authMiddleware,
   makeAdminValidation,
   validate,
-  allowRoles(["owner","admin"]),
+  allowRoles(["owner", "admin"]),
   makeAdmin,
 );
-
 
 export default router;

@@ -16,10 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 // api endpoints
-app.use("/api/food", foodRoute);
-app.use("/api/user", userRoute);
+app.use("/api/foods", foodRoute);
+app.use("/api/users", userRoute);
 app.use("/api/cart", cartRoute);
-app.use("/api/order", orderRoute);
+app.use("/api/orders", orderRoute);
 
 // Get the directory name of the current module to create an absolute path
 const __filename = fileURLToPath(import.meta.url);
