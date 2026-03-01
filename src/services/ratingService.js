@@ -10,13 +10,17 @@ export const createRating = async (ratingData) => {
   }
 };
 
-export const getRatingsByFoodId = async (foodId) => {
+export const getRatingsByFoodId = async (foodId, page = 1, limit = 10) => {
   try {
-    const ratings = await Rating.find({ food: foodId }).populate(
-      "user",
-      "name",
-    ).populate("food", "name");
-    return ratings;
+    const skip = (page - 1) * limit;
+    const ratings = await Rating.find({ food: foodId })
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "name")
+      .populate("food", "name");
+
+    const total = await Rating.countDocuments({ food: foodId });
+    return { ratings, total };
   } catch (error) {
     throw error;
   }

@@ -79,10 +79,22 @@ export const removeRating = async (req, res, next) => {
 
 export const getFoodRatings = async (req, res, next) => {
   try {
-    const ratings = await getRatingsByFoodId(req.params.foodId);
-    res
-      .status(200)
-      .json({ success: true, count: ratings.length, data: ratings });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const { ratings, total } = await getRatingsByFoodId(
+      req.params.foodId,
+      page,
+      limit,
+    );
+    res.status(200).json({
+      success: true,
+      count: ratings.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      data: ratings,
+    });
   } catch (error) {
     next(error);
   }

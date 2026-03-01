@@ -9,12 +9,25 @@ export const createDeliveryRating = async (ratingData) => {
   }
 };
 
-export const getRatingsByDeliveryPersonId = async (deliveryPersonId) => {
+export const getRatingsByDeliveryPersonId = async (
+  deliveryPersonId,
+  page = 1,
+  limit = 10,
+) => {
   try {
+    const skip = (page - 1) * limit;
     const ratings = await DeliveryRating.find({
       deliveryPerson: deliveryPersonId,
-    }).populate("user", "name").populate("deliveryPerson", "name");
-    return ratings;
+    })
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "name")
+      .populate("deliveryPerson", "name");
+
+    const total = await DeliveryRating.countDocuments({
+      deliveryPerson: deliveryPersonId,
+    });
+    return { ratings, total };
   } catch (error) {
     throw error;
   }

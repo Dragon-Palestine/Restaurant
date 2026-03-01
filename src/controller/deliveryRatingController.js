@@ -79,10 +79,20 @@ export const removeDeliveryRating = async (req, res, next) => {
 
 export const getDeliveryRatings = async (req, res, next) => {
   try {
-    const ratings = await getRatingsByDeliveryPersonId(req.params.id);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const { ratings, total } = await getRatingsByDeliveryPersonId(
+      req.params.id,
+      page,
+      limit,
+    );
     res.status(200).json({
       success: true,
       count: ratings.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
       data: ratings,
     });
   } catch (error) {
