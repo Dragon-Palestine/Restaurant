@@ -9,9 +9,9 @@ export const createFood = async (foodData) => {
     throw error;
   }
 };
-export const getAllFoods = async (page = 1, limit = 10) => {
+export const getAllFoods = async (page = 1, limit = 10, query = {}) => {
   try {
-    const result = await paginate(Food, {}, page, limit);
+    const result = await paginate(Food, query, page, limit);
     return result;
   } catch (error) {
     throw error;

@@ -37,8 +37,13 @@ export const getFoods = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const { search, category } = req.query;
 
-    const result = await getAllFoods(page, limit);
+    const query = {};
+    if (search) query.name = { $regex: search, $options: "i" };
+    if (category) query.category = category;
+
+    const result = await getAllFoods(page, limit, query);
     res.status(200).json({
       success: true,
       ...result,
