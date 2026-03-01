@@ -35,11 +35,13 @@ export const addFood = async (req, res, next) => {
 
 export const getFoods = async (req, res, next) => {
   try {
-    const foods = await getAllFoods();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const result = await getAllFoods(page, limit);
     res.status(200).json({
       success: true,
-      data: foods,
-      message: "Foods fetched successfully",
+      ...result,
     });
   } catch (error) {
     next(error);
@@ -70,13 +72,11 @@ export const updateFood = async (req, res, next) => {
     };
     const newFood = await updateFoodById(id, foodData);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        data: newFood,
-        message: "Food updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      data: newFood,
+      message: "Food updated successfully",
+    });
   } catch (error) {
     next(error);
   }

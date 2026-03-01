@@ -82,18 +82,14 @@ export const getDeliveryRatings = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    const { ratings, total } = await getRatingsByDeliveryPersonId(
+    const result = await getRatingsByDeliveryPersonId(
       req.params.id,
       page,
       limit,
     );
     res.status(200).json({
       success: true,
-      count: ratings.length,
-      total,
-      page,
-      pages: Math.ceil(total / limit),
-      data: ratings,
+      ...result,
     });
   } catch (error) {
     next(error);

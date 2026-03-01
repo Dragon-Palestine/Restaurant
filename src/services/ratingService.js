@@ -1,4 +1,5 @@
 import Rating from "../models/ratingModel.js";
+import { paginate } from "../utils/pagination.js";
 
 export const createRating = async (ratingData) => {
   try {
@@ -12,15 +13,11 @@ export const createRating = async (ratingData) => {
 
 export const getRatingsByFoodId = async (foodId, page = 1, limit = 10) => {
   try {
-    const skip = (page - 1) * limit;
-    const ratings = await Rating.find({ food: foodId })
-      .skip(skip)
-      .limit(limit)
-      .populate("user", "name")
-      .populate("food", "name");
-
-    const total = await Rating.countDocuments({ food: foodId });
-    return { ratings, total };
+    const result = await paginate(Rating, { food: foodId }, page, limit, [
+      { path: "user", select: "name" },
+      { path: "food", select: "name" },
+    ]);
+    return result;
   } catch (error) {
     throw error;
   }

@@ -1,4 +1,5 @@
 import DeliveryRating from "../models/deliveryRatingModel.js";
+import { paginate } from "../utils/pagination.js";
 
 export const createDeliveryRating = async (ratingData) => {
   try {
@@ -15,19 +16,17 @@ export const getRatingsByDeliveryPersonId = async (
   limit = 10,
 ) => {
   try {
-    const skip = (page - 1) * limit;
-    const ratings = await DeliveryRating.find({
-      deliveryPerson: deliveryPersonId,
-    })
-      .skip(skip)
-      .limit(limit)
-      .populate("user", "name")
-      .populate("deliveryPerson", "name");
-
-    const total = await DeliveryRating.countDocuments({
-      deliveryPerson: deliveryPersonId,
-    });
-    return { ratings, total };
+    const result = await paginate(
+      DeliveryRating,
+      { deliveryPerson: deliveryPersonId },
+      page,
+      limit,
+      [
+        { path: "user", select: "name" },
+        { path: "deliveryPerson", select: "name" },
+      ],
+    );
+    return result;
   } catch (error) {
     throw error;
   }
