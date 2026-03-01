@@ -20,6 +20,10 @@ const userSchema = new Schema(
       type: Object,
       default: {},
     },
+    favorites: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Food" }],
+      default: [],
+    },
     role: {
       type: String,
       enum: ["customer", "owner", "admin","admin_pending", "delivery"],

@@ -9,6 +9,7 @@ import foodRoute from "./routes/foodRoute.js";
 import userRoute from "./routes/userRoute.js";
 import cartRoute from "./routes/cartRoute.js";
 import orderRoute from "./routes/orderRoute.js";
+import favoriteRoute from "./routes/favoriteRoute.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/foods", foodRoute);
 app.use("/api/users", userRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/orders", orderRoute);
+app.use("/api/favorites", favoriteRoute);
 
 // Get the directory name of the current module to create an absolute path
 const __filename = fileURLToPath(import.meta.url);
