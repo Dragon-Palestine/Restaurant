@@ -11,6 +11,7 @@ import {
   updateDeliveryRatingValidation,
 } from "../middleware/deliveryRatingValidator.js";
 import { validate } from "../middleware/validationResult.js";
+import { actionLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -23,6 +24,7 @@ router
   .route("/")
   .post(
     authMiddleware,
+    actionLimiter,
     addDeliveryRatingValidation,
     validate,
     addDeliveryRating,

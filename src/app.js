@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import { errorHandler } from "./middleware/errorHandel.js";
+import { apiLimiter, authLimiter } from "./middleware/rateLimiter.js";
 
 // Routes
 import foodRoute from "./routes/foodRoute.js";
@@ -18,9 +19,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Apply global rate limiter to all API routes
+app.use("/api", apiLimiter);
+
 // api endpoints
 app.use("/api/foods", foodRoute);
-app.use("/api/users", userRoute);
+app.use("/api/users", authLimiter, userRoute); // Stricter limit for auth/user routes
 app.use("/api/cart", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/favorites", favoriteRoute);

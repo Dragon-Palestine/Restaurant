@@ -15,10 +15,18 @@ import {
   getOrderValidation,
 } from "../middleware/orderValidator.js";
 import { validate } from "../middleware/validationResult.js";
+import { actionLimiter } from "../middleware/rateLimiter.js";
 const router = express.Router();
 
 // Place a new order
-router.post("/", authMiddleware, placeOrderValidation, validate, placeOrder);
+router.post(
+  "/",
+  authMiddleware,
+  actionLimiter,
+  placeOrderValidation,
+  validate,
+  placeOrder,
+);
 
 // Verify payment (Stripe callback)
 router.post(
