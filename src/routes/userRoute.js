@@ -20,8 +20,12 @@ import {
 import { validate } from "../middleware/validationResult.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
+import deliveryRatingRouter from "./deliveryRatingRoute.js";
 
 const router = express.Router();
+
+// Re-route to delivery rating router
+router.use("/:id/ratings", deliveryRatingRouter);
 
 // Register a new customer (public)
 router.post("/register", registerValidation, validate, registerUser);

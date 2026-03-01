@@ -14,8 +14,12 @@ import {
 import { validate } from "../middleware/validationResult.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
+import ratingRouter from "./ratingRoute.js";
 
 const router = express.Router();
+
+// Re-route to other resource routers
+router.use("/:foodId/ratings", ratingRouter);
 
 // Add new food item (Admin only)
 router.post(
