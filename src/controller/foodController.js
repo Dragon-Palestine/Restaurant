@@ -11,7 +11,9 @@ export const addFood = async (req, res, next) => {
   try {
     const { name, price, description, category } = req.body;
     if (!req.file) {
-      throw new Error("multer dosent work");
+      const error = new Error("Image is required");
+      error.statusCode = 400;
+      throw error;
     }
     const image = req.file.filename;
     const foodData = {

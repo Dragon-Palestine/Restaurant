@@ -56,6 +56,10 @@ export const editRating = async (req, res, next) => {
       return next(error);
     }
 
+    // Notify clients about the updated rating
+    const io = req.app.get("io");
+    io.to(`food_${req.params.foodId}`).emit("ratingUpdated", updatedRating);
+
     res.status(200).json({
       success: true,
       message: "Your review has been updated.",
@@ -74,6 +78,11 @@ export const removeRating = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+
+    // Notify clients that a rating was removed
+    const io = req.app.get("io");
+    io.to(`food_${req.params.foodId}`).emit("ratingDeleted", req.user.id);
+
     res.status(200).json({ success: true, message: "Rating removed" });
   } catch (error) {
     next(error);

@@ -56,6 +56,11 @@ export const editDeliveryRating = async (req, res, next) => {
       return next(error);
     }
 
+    // Notify delivery person and admin about the update
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("deliveryRatingUpdated", updatedRating);
+    io.to("adminRoom").emit("deliveryRatingUpdated", updatedRating);
+
     res.status(200).json({
       success: true,
       message: "Your delivery review has been updated.",
@@ -75,6 +80,12 @@ export const removeDeliveryRating = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+
+    // Notify delivery person and admin about the deletion
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("deliveryRatingDeleted", req.user.id);
+    io.to("adminRoom").emit("deliveryRatingDeleted", req.user.id);
+
     res.status(200).json({ success: true, message: "Rating removed" });
   } catch (error) {
     next(error);

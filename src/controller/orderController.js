@@ -15,12 +15,13 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const placeOrder = async (req, res, next) => {
-  if (!process.env.FRONTEND_PORT) {
-    const error = new Error(".env 'FRONTEND_PORT' is empty");
-    error.statusCode = 404;
-    return next(error);
-  }
-  const frontend_url = `http://localhost:${process.env.FRONTEND_PORT}`;
+  // Use FRONTEND_URL if available (Production), otherwise fallback to localhost
+  const frontend_url =
+    process.env.FRONTEND_URL ||
+    (process.env.FRONTEND_PORT
+      ? `http://localhost:${process.env.FRONTEND_PORT}`
+      : "http://localhost:3000");
+
   let orderId;
   try {
     const orderData = {
