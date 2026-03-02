@@ -8,7 +8,7 @@ import {
   getOrderById,
   feachAllOrders,
   deleteOrderById,
-  getOrdersByUserId
+  getOrdersByUserId,
 } from "../services/orderService.js";
 import Stripe from "stripe";
 
@@ -31,6 +31,9 @@ export const placeOrder = async (req, res, next) => {
     };
     const newOrder = await createOrder(orderData);
     orderId = newOrder._id;
+
+    const io = req.app.get("io");
+    io.to("adminRoom").emit("newOrder", newOrder);
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
@@ -75,13 +78,28 @@ export const verifyOrder = async (req, res, next) => {
   const { orderId, success } = req.body;
   try {
     if (success == "true") {
-      await getOrderByIdAndUpdate(orderId, {
+      const updatedOrder = await getOrderByIdAndUpdate(orderId, {
         payment: true,
         status: "confirmed",
       });
+
+      const io = req.app.get("io");
+      io.to(updatedOrder.userId.toString()).emit(
+        "paymentSuccess",
+        updatedOrder,
+      );
+      io.to("adminRoom").emit("orderUpdated", updatedOrder);
+
       res.json({ success: true, message: "Paid" });
     } else {
-      await getOrderByIdAndUpdate(orderId, { status: "cancelled" });
+      const updatedOrder = await getOrderByIdAndUpdate(orderId, {
+        status: "cancelled",
+      });
+
+      const io = req.app.get("io");
+      io.to(updatedOrder.userId.toString()).emit("paymentFailed", updatedOrder);
+      io.to("adminRoom").emit("orderUpdated", updatedOrder);
+
       res.json({ success: false, message: "Not Paid" });
     }
   } catch (error) {
@@ -109,9 +127,18 @@ export const getAllOrders = async (req, res, next) => {
 
 export const updateOrderStatus = async (req, res, next) => {
   try {
-    await getOrderByIdAndUpdate(req.params.orderId, {
+    const updatedOrder = await getOrderByIdAndUpdate(req.params.orderId, {
       status: req.body.status,
     });
+
+    const io = req.app.get("io");
+    if (updatedOrder && updatedOrder.userId) {
+      io.to(updatedOrder.userId.toString()).emit(
+        "orderStatusUpdate",
+        updatedOrder,
+      );
+    }
+
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {
     next(error);
@@ -126,6 +153,11 @@ export const deleteOrder = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Order not found" });
     }
+
+    const io = req.app.get("io");
+    io.to("adminRoom").emit("orderDeleted", req.params.orderId);
+    io.to(order.userId.toString()).emit("orderDeleted", req.params.orderId);
+
     res.json({ success: true, message: "Order Deleted" });
   } catch (error) {
     next(error);

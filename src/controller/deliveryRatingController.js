@@ -16,6 +16,10 @@ export const addDeliveryRating = async (req, res, next) => {
 
     const newRating = await createDeliveryRating(ratingData);
 
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("newDeliveryRating", newRating);
+    io.to("adminRoom").emit("newDeliveryRating", newRating);
+
     res.status(201).json({
       success: true,
       message: "Thank you for rating the delivery service!",

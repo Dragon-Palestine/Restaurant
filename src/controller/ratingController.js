@@ -16,6 +16,9 @@ export const addRating = async (req, res, next) => {
 
     const newRating = await createRating(ratingData);
 
+    const io = req.app.get("io");
+    io.to(`food_${req.params.foodId}`).emit("newRating", newRating);
+
     res.status(201).json({
       success: true,
       message: "Thank you for your review!",

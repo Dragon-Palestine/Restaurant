@@ -22,6 +22,10 @@ export const addFood = async (req, res, next) => {
       category,
     };
     const food = await createFood(foodData);
+
+    const io = req.app.get("io");
+    io.emit("foodAdded", food);
+
     res
       .status(201)
       .json({ success: true, data: food, message: "Food added successfully" });
@@ -59,6 +63,10 @@ export const deleteFood = async (req, res, next) => {
     const food = await getFoodById(id);
     unlikeFile(`uploads/${food.image}`);
     await deleteFoodById(id);
+
+    const io = req.app.get("io");
+    io.emit("foodDeleted", id);
+
     res.status(200).json({ success: true, message: "Food removed" });
   } catch (error) {
     next(error);
@@ -76,6 +84,9 @@ export const updateFood = async (req, res, next) => {
       category,
     };
     const newFood = await updateFoodById(id, foodData);
+
+    const io = req.app.get("io");
+    io.emit("foodUpdated", newFood);
 
     res.status(200).json({
       success: true,
