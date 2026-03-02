@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "url";
 import { errorHandler } from "./middleware/errorHandel.js";
@@ -17,6 +18,9 @@ import deliveryRatingRoute from "./routes/deliveryRatingRoute.js";
 const app = express();
 
 app.use(cors());
+// Apply Helmet for security headers globally
+// We set crossOriginResourcePolicy to "cross-origin" to allow the frontend to load images served by this API
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express.json());
 
 // Apply global rate limiter to all API routes
