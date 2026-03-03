@@ -3,8 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "url";
-import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
+//import mongoSanitize from "express-mongo-sanitize";
+//import { xss } from "express-xss-sanitizer";
 import hpp from "hpp";
 import { errorHandler } from "./middleware/errorHandel.js";
 import { apiLimiter, authLimiter } from "./middleware/rateLimiter.js";
@@ -26,23 +26,16 @@ app.disable("x-powered-by");
 app.use(cors());
 // Apply Helmet for security headers globally
 // We set crossOriginResourcePolicy to "cross-origin" to allow the frontend to load images served by this API
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "trusted-cdn.com"],
-    },
-  }),
-);
+app.use(helmet());
 // Set request size limits to prevent DoS attacks
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Data sanitization against XSS attacks
-app.use(xss());
+//app.use(xss());
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+//app.use(mongoSanitize());
 
 // Prevent HTTP Parameter Pollution
 app.use(hpp());
