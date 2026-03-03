@@ -11,6 +11,7 @@ import {
   getOrdersByUserId,
 } from "../services/orderService.js";
 import Stripe from "stripe";
+import { orderResponse } from "../utils/responseFormatters.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -111,7 +112,7 @@ export const verifyOrder = async (req, res, next) => {
 export const getUserOrders = async (req, res, next) => {
   try {
     const orders = await getOrdersByUserId(req.user.id);
-    res.json({ success: true, data: orders });
+    res.json({ success: true, data: orders.map(orderResponse) });
   } catch (error) {
     next(error);
   }
@@ -120,7 +121,7 @@ export const getUserOrders = async (req, res, next) => {
 export const getAllOrders = async (req, res, next) => {
   try {
     const orders = await feachAllOrders();
-    res.json({ success: true, data: orders });
+    res.json({ success: true, data: orders.map(orderResponse) });
   } catch (error) {
     next(error);
   }
@@ -173,7 +174,7 @@ export const getSingleOrder = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Order not found" });
     }
-    res.json({ success: true, data: order });
+    res.json({ success: true, data: orderResponse(order) });
   } catch (error) {
     next(error);
   }

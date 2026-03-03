@@ -6,6 +6,7 @@ import {
   getFoodById,
   updateFoodById,
 } from "../services/foodService.js";
+import { foodResponse } from "../utils/responseFormatters.js";
 
 export const addFood = async (req, res, next) => {
   try {
@@ -30,7 +31,11 @@ export const addFood = async (req, res, next) => {
 
     res
       .status(201)
-      .json({ success: true, data: food, message: "Food added successfully" });
+      .json({
+        success: true,
+        data: foodResponse(food),
+        message: "Food added successfully",
+      });
   } catch (error) {
     if (req.file) {
       unlikeFile(`uploads/${req.file.filename}`);
@@ -53,6 +58,7 @@ export const getFoods = async (req, res, next) => {
     res.status(200).json({
       success: true,
       ...result,
+      data: result.data.map(foodResponse),
     });
   } catch (error) {
     next(error);
@@ -92,7 +98,7 @@ export const updateFood = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: newFood,
+      data: foodResponse(newFood),
       message: "Food updated successfully",
     });
   } catch (error) {

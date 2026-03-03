@@ -6,8 +6,9 @@ import {
   getActiveUserByIdAndSoftDelete,
   getAllActiveUsers,
   getActiveUserByEmail,
-  getUserByIdAndUpdate
+  getUserByIdAndUpdate,
 } from "../services/userService.js";
+import { userResponse } from "../utils/responseFormatters.js";
 
 export const initOwner = async () => {
   const user = await getActiveUserByEmail("loai@gmail.com");
@@ -24,7 +25,7 @@ export const initOwner = async () => {
 
 export const registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
-  let {role}=req.body;
+  let { role } = req.body;
 
   try {
     const hashedPassword = await hashPassword(password);
@@ -41,12 +42,7 @@ export const registerUser = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      data: userResponse(user),
     });
   } catch (error) {
     next(error);
@@ -60,12 +56,7 @@ export const makeAdmin = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User made admin successfully",
-      data: {
-        id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-      },
+      data: userResponse(updatedUser),
     });
   } catch (error) {
     next(error);
@@ -75,11 +66,12 @@ export const loginUser = async (req, res, next) => {
   const { email } = req.body;
   try {
     const user = req.user;
-    const token = generateToken(user.email, user._id,user.role);
+    const token = generateToken(user.email, user._id, user.role);
 
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
+      data: userResponse(user),
       token: token,
     });
   } catch (error) {
@@ -106,12 +98,7 @@ export const updateUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User updated successfully",
-      data: {
-        id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-      },
+      data: userResponse(updatedUser),
     });
   } catch (error) {
     next(error);
@@ -126,31 +113,24 @@ export const removeUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User removed successfully",
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      data: userResponse(user),
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const restoreUser= async (req, res, next) => {
+export const restoreUser = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const user = await getUserByIdAndUpdate(id,{isDeleted:false,deletedAt:null});
+    const user = await getUserByIdAndUpdate(id, {
+      isDeleted: false,
+      deletedAt: null,
+    });
     res.status(200).json({
       success: true,
       message: "User restored successfully",
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      data: userResponse(user),
     });
   } catch (error) {
     next(error);
@@ -161,7 +141,7 @@ export const getAllUsers = async (req, res, next) => {
   try {
     const users = await getAllActiveUsers();
     res.status(200).json({
-      data: users,
+      data: users.map(userResponse),
       success: true,
       masseage: "Users fetched successfully",
     });

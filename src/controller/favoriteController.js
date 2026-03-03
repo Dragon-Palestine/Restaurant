@@ -3,6 +3,7 @@ import {
   removeFavoriteFromUser,
   getUserFavorites,
 } from "../services/favoriteService.js";
+import { foodResponse } from "../utils/responseFormatters.js";
 
 export const addFavorite = async (req, res, next) => {
   try {
@@ -11,7 +12,7 @@ export const addFavorite = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Food added to favorites",
-      data: favorites,
+      data: favorites.map(foodResponse),
     });
   } catch (error) {
     next(error);
@@ -25,7 +26,7 @@ export const removeFavorite = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Food removed from favorites",
-      data: favorites,
+      data: favorites.map(foodResponse),
     });
   } catch (error) {
     next(error);
@@ -37,7 +38,7 @@ export const getFavorites = async (req, res, next) => {
     const favorites = await getUserFavorites(req.user.id);
     res.status(200).json({
       success: true,
-      data: favorites,
+      data: favorites.map(foodResponse),
     });
   } catch (error) {
     next(error);
