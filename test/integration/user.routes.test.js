@@ -41,7 +41,7 @@ describe("User Routes - POST /api/users/register", () => {
     expect(res.status).to.equal(201);
     expect(res.body.success).to.be.true;
     expect(res.body.message).to.equal("User registered successfully");
-    expect(res.body.data).to.have.property("id", "mockUserId");
+    expect(res.body.data).to.have.property("id", mockUserDoc._id);
     expect(hashStub.called).to.be.true;
     expect(createStub.called).to.be.true;
   });

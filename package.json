@@ -1,9 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Restaurant Food",
   "license": "ISC",
-  "author": "",
+  "author": "loai",
   "type": "module",
   "main": "server.js",
   "scripts": {

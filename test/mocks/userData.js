@@ -17,17 +17,11 @@ export const newUserPayload = {
  */
 export const mockUserDoc = {
   _id: "mockUserId",
+  id: "mockUserId",
   name: "Test User",
   email: "test@example.com",
   password: "hashed_password",
   role: "customer",
-  // Simulate Mongoose's toObject method for clean data extraction in responses
-  toObject: () => ({
-    id: "mockUserId",
-    name: "Test User",
-    email: "test@example.com",
-    role: "customer",
-  }),
 };
 
 /**

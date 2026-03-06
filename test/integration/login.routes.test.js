@@ -11,6 +11,7 @@ import {
   newUserPayload,
   wrongPasswordCredentials,
   mockUserWithHashedPassword,
+  invalidUserPayload
 } from "../mocks/userData.js";
 
 describe("User Routes - POST /api/users/login", () => {
@@ -36,7 +37,7 @@ describe("User Routes - POST /api/users/login", () => {
     const res = await request(app)
       .post("/api/users/login")
       .send(loginCredentials);
-
+    
     expect(res.status).to.equal(200);
     expect(res.body.success).to.be.true;
     expect(res.body.message).to.equal("User logged in successfully");
@@ -45,8 +46,8 @@ describe("User Routes - POST /api/users/login", () => {
 
     // Verify the token contains the correct payload
     const decoded = jwt.verify(res.body.token, process.env.JWT_SECRET);
-    expect(decoded.id).to.equal("mockUserId");
-    expect(decoded.email).to.equal("test@example.com");
+    expect(decoded.id).to.equal(mockUserDoc._id);
+    expect(decoded.email).to.equal(mockUserDoc.email);
   });
 
   it("should return 400 for invalid credentials (wrong password)", async () => {
@@ -66,7 +67,7 @@ describe("User Routes - POST /api/users/login", () => {
     findOneStub.resolves(null); // User is not found
     const res = await request(app)
       .post("/api/users/login")
-      .send({ email: "notfound@example.com", password: "password123" });
+      .send(invalidUserPayload);
     expect(res.status).to.equal(400);
     expect(res.body.errors[0].msg).to.equal("Invalid credentials");
   });

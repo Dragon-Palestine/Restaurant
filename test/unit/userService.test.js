@@ -13,7 +13,7 @@ describe("User Service", () => {
   describe("createUser", () => {
     it("should create a new user successfully", async () => {
       // Use a subset of the payload for this service test
-      const userData = { ...newUserPayload, password: "hashedpassword" };
+      const userData = newUserPayload;
 
       // Stub the User.create method
       const createStub = sinon.stub(User, "create").resolves(mockUserDoc);
@@ -26,7 +26,7 @@ describe("User Service", () => {
     });
 
     it("should throw an error if user creation fails", async () => {
-      const userData = { ...newUserPayload, password: "hashedpassword" };
+      const userData = newUserPayload;
       const error = new Error("Database error");
 
       // Stub the User.create method to reject
