@@ -3,8 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "node:url";
-import mongoSanitize from "express-mongo-sanitize";
-import { xss } from "express-xss-sanitizer";
+//import mongoSanitize from "express-mongo-sanitize";
+//import { xss } from "express-xss-sanitizer";
 import hpp from "hpp";
 import { errorHandler } from "./middleware/errorHandel.js";
 import { apiLimiter, authLimiter } from "./middleware/rateLimiter.js";
@@ -32,10 +32,10 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Data sanitization against XSS attacks
-app.use(xss());
+//app.use(xss());
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+//app.use(mongoSanitize());
 
 // Prevent HTTP Parameter Pollution
 app.use(hpp());
