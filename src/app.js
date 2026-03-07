@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import path from "path";
-import { fileURLToPath } from "url";
-//import mongoSanitize from "express-mongo-sanitize";
-//import { xss } from "express-xss-sanitizer";
+import { fileURLToPath } from "node:url";
+import mongoSanitize from "express-mongo-sanitize";
+import { xss } from "express-xss-sanitizer";
 import hpp from "hpp";
 import { errorHandler } from "./middleware/errorHandel.js";
 import { apiLimiter, authLimiter } from "./middleware/rateLimiter.js";
@@ -15,7 +15,7 @@ import userRoute from "./routes/userRoute.js";
 import cartRoute from "./routes/cartRoute.js";
 import orderRoute from "./routes/orderRoute.js";
 import favoriteRoute from "./routes/favoriteRoute.js";
-import ratingRoute from "./routes/ratingRoute.js";
+import ratingRoute from "./routes/foodRatingRoute.js";
 import deliveryRatingRoute from "./routes/deliveryRatingRoute.js";
 
 const app = express();
@@ -32,10 +32,10 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Data sanitization against XSS attacks
-//app.use(xss());
+app.use(xss());
 
 // Data sanitization against NoSQL query injection
-//app.use(mongoSanitize());
+app.use(mongoSanitize());
 
 // Prevent HTTP Parameter Pollution
 app.use(hpp());
@@ -58,6 +58,7 @@ const __dirname = path.dirname(__filename);
 // To serve image files from the "uploads" folder
 app.use("/images", express.static(path.join(__dirname, "..", "uploads")));
 
+// API TEST
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

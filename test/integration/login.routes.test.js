@@ -11,7 +11,6 @@ import {
   newUserPayload,
   wrongPasswordCredentials,
   mockUserWithHashedPassword,
-  invalidUserPayload
 } from "../mocks/userData.js";
 
 describe("User Routes - POST /api/users/login", () => {
@@ -37,7 +36,7 @@ describe("User Routes - POST /api/users/login", () => {
     const res = await request(app)
       .post("/api/users/login")
       .send(loginCredentials);
-    
+
     expect(res.status).to.equal(200);
     expect(res.body.success).to.be.true;
     expect(res.body.message).to.equal("User logged in successfully");
@@ -65,9 +64,10 @@ describe("User Routes - POST /api/users/login", () => {
 
   it("should return 400 for invalid credentials (user not found)", async () => {
     findOneStub.resolves(null); // User is not found
-    const res = await request(app)
-      .post("/api/users/login")
-      .send(invalidUserPayload);
+    const res = await request(app).post("/api/users/login").send({
+      email: "nonexistent@user.com",
+      password: "anypassword",
+    });
     expect(res.status).to.equal(400);
     expect(res.body.errors[0].msg).to.equal("Invalid credentials");
   });

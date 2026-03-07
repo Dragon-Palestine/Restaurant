@@ -1,4 +1,4 @@
-import Rating from "../models/ratingModel.js";
+import Rating from "../models/foodRatingModel.js";
 import { paginate } from "../utils/pagination.js";
 
 export const createRating = async (ratingData) => {

@@ -73,5 +73,5 @@ ratingSchema.post("findOneAndUpdate", async function (doc) {
   }
 });
 
-const Rating = mongoose.model("Rating", ratingSchema);
+const Rating = mongoose.model("FoodRating", ratingSchema);
 export default Rating;

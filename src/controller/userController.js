@@ -109,7 +109,6 @@ export const removeUser = async (req, res, next) => {
   try {
     const id = req.params.id;
     const user = await getActiveUserByIdAndSoftDelete(id);
-    console.log(user);
     res.status(200).json({
       success: true,
       message: "User removed successfully",

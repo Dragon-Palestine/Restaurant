@@ -3,7 +3,7 @@ import {
   getRatingsByFoodId,
   deleteRating,
   updateRating,
-} from "../services/ratingService.js";
+} from "../services/foodRatingService.js";
 
 export const addRating = async (req, res, next) => {
   try {

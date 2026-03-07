@@ -14,7 +14,7 @@ import {
 import { validate } from "../middleware/validationResult.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
-import ratingRouter from "./ratingRoute.js";
+import ratingRouter from "./foodRatingRoute.js";
 
 const router = express.Router();
 

@@ -57,7 +57,6 @@ export const getFoods = async (req, res, next) => {
     const result = await getAllFoods(page, limit, query);
     res.status(200).json({
       success: true,
-      ...result,
       data: result.data.map(foodResponse),
     });
   } catch (error) {

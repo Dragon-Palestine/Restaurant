@@ -5,11 +5,11 @@ import {
   getFoodRatings,
   editRating,
   removeRating,
-} from "../controller/ratingController.js";
+} from "../controller/foodRatingController.js";
 import {
   addRatingValidation,
   updateRatingValidation,
-} from "../middleware/ratingValidator.js";
+} from "../middleware/foodRatingValidator.js";
 import { validate } from "../middleware/validationResult.js";
 
 const router = express.Router({ mergeParams: true });
